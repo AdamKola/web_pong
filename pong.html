@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pong by Adam Koliński</title>
+    
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: darkgrey;
+        }
+        canvas {
+            border: solid 3px #fff;
+        }
+    
+    </style>
+    
+</head>
+<body>
+    
+    <canvas></canvas>
+    
+    <script>
+    
+        const canvas = document.querySelector('canvas');
+        const ctx = canvas.getContext("2d");
+        
+        canvas.width = 700;
+        canvas.height = 350;
+        
+        const cw = canvas.width;
+        const ch = canvas.height;
+        const xMiddle = cw/2-2;
+        const yMiddle = ch/2;
+        
+        const ballSize = 16;
+        
+        let ballX = cw/2-ballSize/2;
+        let ballY = ch/2-ballSize/2;
+        
+        let ballSpeedX = 3;
+        let ballSpeedY = 2;
+        
+        const paddleWidth = 10;
+        const paddleHeight = 100;
+        
+        const xPlayer = 50;
+        const xEnemy = cw-50-paddleWidth;
+        
+        let yPlayer = 125;
+        let yEnemy = 125;
+        
+        let playerScore = 0;
+        let enemyScore = 0;
+        
+        
+        function player() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(xPlayer, yPlayer, paddleWidth, paddleHeight);
+        }
+        
+        function enemy() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(xEnemy, yEnemy, paddleWidth, paddleHeight);
+        }
+        
+        function ball() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(ballX, ballY, ballSize, ballSize);
+            
+            if(ballX <= 0 || ballX >= cw-ballSize)
+                ballSpeedX *= -1;
+            if(ballY <= 0 || ballY >= ch- ballSize) 
+                ballSpeedY *= -1;
+            
+            if(ballX <= xPlayer+paddleWidth){
+                
+                if(ballY <= yPlayer+paddleHeight && ballY >= yPlayer) ballSpeedX *= -1;
+            }
+            
+            if(ballX == xEnemy-paddleWidth){
+                
+                if(ballY <= yEnemy+paddleHeight && ballY >= yEnemy)ballSpeedX *= -1;
+            }
+            
+            if(ballX <= 0) Score(2);
+            
+            if(ballX+ballSize >=cw) Score(1);
+            
+            
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+        }
+        
+        function table() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, cw, ch);
+            
+            ctx.fillStyle = "grey";
+            for(let linePosition = 13; linePosition < ch; linePosition +=34) {
+                ctx.fillRect((cw/2)-2, linePosition, 4, 16);
+            }
+            
+            ctx.fillStyle = 'grey';
+            ctx.font = "72px Arial";
+            ctx.fillText(playerScore, xMiddle - 72, 72);
+            ctx.fillText(enemyScore, xMiddle + 36, 72);
+        }
+        
+        function Score(playerPoint) {
+            if(playerPoint == 1) playerScore +=1;
+            if(playerPoint == 2) enemyScore +=1;
+            playerPoint = 0;
+            resetView();
+        }
+        
+        topCanvas = canvas.offsetTop;
+        
+        function playerPosition(e){ 
+            
+            yPlayer = e.clientY - topCanvas - paddleHeight/2;
+            if(yPlayer < 0) yPlayer = 0;
+            if(yPlayer+paddleHeight > ch) yPlayer = ch-paddleHeight;
+            yEnemy = yPlayer;
+        }
+        
+        function resetView(){
+            yPlayer = 125;
+            yEnemy = 125;
+            ballX = cw/2-ballSize/2;
+            ballY = ch/2-ballSize/2;
+            ballSpeedX = 0;
+            ballSpeedY = 0;
+            setTimeout(function(){ballSpeedX = 3; ballSpeedY = 2;},2000);
+            
+        }
+        
+        window.addEventListener("mousemove", playerPosition);
+        
+        function game() {
+        table();
+        ball();
+        player();
+        enemy();
+        }
+        setInterval(game, 1000/ 120);
+        
+    </script>
+</body>
+</html>
